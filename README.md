@@ -1,4 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Compass
+
+## 初次运行
+
+初始化数据库，运行本地服务器
+```bash
+npx prisma migrate deploy
+npx prisma generate
+npm run dev
+```
+
+### Prisma 变更数据结构
+修改`schema.prisma`数据库结构后:
+1. 执行
+```bash
+npx prisma migrate dev --name {你做了什么操作}  --create-only
+```
+
+2. 检查`prisma/`生成的脚本是否有问题，如果有问题，手动修改。
+
+3. 将实体变更apply到数据库
+```bash
+npx prisma migrate deploy
+```
+
+生成prisma实体
+```bash
+npx prisma generate
+```
 
 ## Getting Started
 
