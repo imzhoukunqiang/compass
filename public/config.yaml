@@ -1,6 +1,6 @@
 profile:
   name: Compass
-  avatar: icon:navigation
+  avatar: Navigation
   description: Navigate Your Digital World
   bio: 快速访问常用网站和工具
 settings:
@@ -62,7 +62,7 @@ categories:
       - id: link-1775485409091-feaxy2k59
         name: Memos
         url: https://memos.8080443.xyz/
-        icon: LucideNotebookPen
+        icon: NotebookPen
         description: Note book
       - id: aws
         name: AWS
