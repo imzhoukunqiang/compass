@@ -1,6 +1,6 @@
 profile:
   name: Compass
-  avatar: navigation
+  avatar: icon:navigation
   description: Navigate Your Digital World
   bio: 快速访问常用网站和工具
 settings:
@@ -10,25 +10,75 @@ settings:
   animations: true
 categories:
   - id: daily
-    name: Daily
-    icon: Calendar
+    name: Home
+    icon: Home
     color: '#3b82f6'
     links:
-      - id: github
-        name: GitHub
-        url: https://github.com
-        icon: github
-        description: 代码托管平台
-      - id: gmail
-        name: Gmail
-        url: https://gmail.com
-        icon: gmail
-        description: 电子邮件
-      - id: youtube
-        name: YouTube
-        url: https://youtube.com
-        icon: youtube
-        description: 视频平台
+      - id: Router
+        name: 路由器
+        url: http://192.168.6.1/
+        icon: Router
+        description: 路由器后台
+      - id: Clash.Meta Yacd
+        name: Clash.Meta Yacd
+        url: http://192.168.6.5:9999/ui
+        icon: Cat
+        description: 小猫咪后台
+      - id: Komga
+        name: Komga
+        url: http://192.168.6.5:25600/
+        icon: BookImage
+        description: Komga漫画
+      - id: link-1775485234840-ile3lztfj
+        name: Suwayomi
+        url: http://192.168.6.5:4567/
+        icon: BookImage
+        description: Suwayomi漫画
+      - id: link-1775485254999-r30afxsl7
+        name: Portainer
+        url: https://192.168.6.5:9443/
+        icon: docker
+        description: Docker管理
+      - id: link-1775485303694-7b1mpfwlm
+        name: AdGuard Home
+        url: http://192.168.6.5:3000/
+        icon: adguard
+        description: DNS后台
+  - id: cloud
+    name: Cloud
+    icon: Cloud
+    color: '#06b6d4'
+    links:
+      - id: link-1775485451522-u7o44jr9c
+        name: Blog
+        url: https://coding.gs/
+        icon: PersonStanding
+        description: 个人博客
+      - id: link-1775485361685-cgofefunp
+        name: Nezha
+        url: https://nezha.8080443.xyz/
+        icon: Network
+        description: VPS监控
+      - id: link-1775485409091-feaxy2k59
+        name: Memos
+        url: https://memos.8080443.xyz/
+        icon: LucideNotebookPen
+        description: Note book
+      - id: aws
+        name: AWS
+        url: https://aws.amazon.com
+        icon: CloudLightning
+        description: 亚马逊云服务
+      - id: cloudflare
+        name: Cloudflare
+        url: https://cloudflare.com
+        icon: cloudflare
+        description: CDN 和安全
+      - id: vercel-dashboard
+        name: Vercel Dashboard
+        url: https://vercel.com/dashboard
+        icon: vercel
+        description: 部署管理
   - id: tools
     name: Tools
     icon: Wrench
@@ -59,11 +109,6 @@ categories:
         url: https://www.gemini.com
         icon: googlegemini
         description: Gemini 助手
-      - id: link-1775728649670-rs3tknc5f
-        name: Claude
-        url: https://claude.ai/
-        icon: claude
-        description: Claude AI
   - id: dev
     name: Development
     icon: Code2
@@ -109,23 +154,3 @@ categories:
         url: https://discord.com
         icon: discord
         description: 即时通讯
-  - id: cloud
-    name: Cloud
-    icon: Cloud
-    color: '#06b6d4'
-    links:
-      - id: aws
-        name: AWS
-        url: https://aws.amazon.com
-        icon: CloudLightning
-        description: 亚马逊云服务
-      - id: cloudflare
-        name: Cloudflare
-        url: https://cloudflare.com
-        icon: cloudflare
-        description: CDN 和安全
-      - id: vercel-dashboard
-        name: Vercel Dashboard
-        url: https://vercel.com/dashboard
-        icon: vercel
-        description: 部署管理
