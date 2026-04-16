@@ -3,11 +3,15 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Tabs } from 'radix-ui';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { LayoutGrid, FolderOpen, Code2, AlertCircle, Check, Lock, Loader2 } from 'lucide-react';
 import type { Config } from '../types';
 import { useEditState } from './hooks/use-edit-state';
 import EditHeader from './components/EditHeader';
+import Button from '../components/Button';
+import { AppInput } from '../components/AppInput';
+import { classNames } from '../components/classNames';
 
 const GeneralSettings = dynamic(() => import('./components/GeneralSettings'), {
   loading: () => <SectionLoading />,
@@ -107,7 +111,7 @@ function useServerEditAccess(canSaveToServer: boolean) {
       setLoginToken('');
       setSaveSucceeded(false);
       setSaveError(null);
-      setStatusMessage('已通过身份验证，现在可以直接保存到服务器');
+      setStatusMessage('');
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : '登录失败');
     } finally {
@@ -424,68 +428,67 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
           onLogout={canSaveToServer ? () => void handleLogout() : undefined}
         />
 
-        <div className="mb-2 shrink-0 sm:mb-3">
-          <div className="grid grid-cols-3 gap-1 rounded-[18px] border bg-[var(--panel-strong)] p-1 sm:inline-flex sm:min-w-max" style={{ borderColor: 'var(--panel-border)' }}>
-            {sections.map(({ key, label, icon, count }) => {
-              const isActive = key === activeSection;
-
-              return (
-                <button
+        <Tabs.Root
+          value={activeSection}
+          onValueChange={(value) => handleSectionChange(value as EditSection)}
+          className="min-h-0 flex flex-1 flex-col"
+        >
+          <div className="mb-2 shrink-0 sm:mb-3">
+            <Tabs.List
+              className="inline-flex min-w-max gap-1 rounded-full border bg-[var(--panel-strong)] p-1 panel-border"
+            >
+              {sections.map(({ key, label, icon, count }) => (
+                <Tabs.Trigger
                   key={key}
-                  type="button"
-                  onClick={() => handleSectionChange(key)}
-                  className={`flex min-w-0 items-center justify-center gap-1 rounded-[14px] px-2 py-2 text-[length:var(--edit-tab-font-size-mobile)] font-medium leading-[var(--edit-tab-line-height-mobile)] outline-none transition-colors sm:gap-1.5 sm:px-3 sm:py-2 sm:text-[length:var(--edit-tab-font-size-desktop)] sm:leading-[var(--edit-tab-line-height-desktop)] sm:whitespace-nowrap ${
-                    isActive
-                      ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
-                      : 'text-[var(--muted)]'
-                  }`}
+                  value={key}
+                  className="flex min-w-0 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[length:var(--edit-tab-font-size-mobile)] font-medium leading-[var(--edit-tab-line-height-mobile)] text-[var(--muted)] outline-none transition-all data-[state=active]:bg-[var(--background)] data-[state=active]:text-[var(--foreground)] data-[state=active]:shadow-md sm:px-4 sm:text-[length:var(--edit-tab-font-size-desktop)] sm:leading-[var(--edit-tab-line-height-desktop)] sm:whitespace-nowrap"
                 >
                   {icon}
                   <span className="truncate">{label}</span>
                   {count !== undefined && (
                     <span className="hidden opacity-60 sm:inline">({count})</span>
                   )}
-                </button>
-              );
-            })}
+                </Tabs.Trigger>
+              ))}
+            </Tabs.List>
           </div>
-        </div>
 
-        <div className="min-h-0 flex-1 overflow-hidden">
-          {activeSection === 'general' && (
-            <div className="h-full overflow-y-auto pr-1 outline-none [scrollbar-gutter:stable]">
-              <GeneralSettings
-                profile={config.profile}
-                settings={config.settings}
-                onProfileChange={updateProfile}
-                onSettingsChange={updateSettings}
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <Tabs.Content value="general" className="h-full outline-none data-[state=inactive]:hidden">
+              <div className="h-full overflow-y-auto pr-1 outline-none [scrollbar-gutter:stable]">
+                <GeneralSettings
+                  profile={config.profile}
+                  settings={config.settings}
+                  onProfileChange={updateProfile}
+                  onSettingsChange={updateSettings}
+                />
+              </div>
+            </Tabs.Content>
+
+            <Tabs.Content value="categories" className="h-full outline-none data-[state=inactive]:hidden">
+              <div className="h-full outline-none">
+                <CategoriesEditorSection
+                  categories={config.categories}
+                  onCategoriesChange={handleCategoriesChange}
+                  onAddCategory={addCategory}
+                  onUpdateCategory={updateCategory}
+                  onDeleteCategory={deleteCategory}
+                  onUpdateLink={updateLink}
+                  onAddLink={addLink}
+                  onDeleteLink={deleteLink}
+                />
+              </div>
+            </Tabs.Content>
+
+            <Tabs.Content value="yaml" className="h-full outline-none data-[state=inactive]:hidden">
+              <YamlEditorSection
+                yamlInput={yamlInput}
+                yamlError={yamlError}
+                onChange={handleYamlChange}
               />
-            </div>
-          )}
-
-          {activeSection === 'categories' && (
-            <div className="h-full outline-none">
-              <CategoriesEditorSection
-                categories={config.categories}
-                onCategoriesChange={handleCategoriesChange}
-                onAddCategory={addCategory}
-                onUpdateCategory={updateCategory}
-                onDeleteCategory={deleteCategory}
-                onUpdateLink={updateLink}
-                onAddLink={addLink}
-                onDeleteLink={deleteLink}
-              />
-            </div>
-          )}
-
-          {activeSection === 'yaml' && (
-            <YamlEditorSection
-              yamlInput={yamlInput}
-              yamlError={yamlError}
-              onChange={handleYamlChange}
-            />
-          )}
-        </div>
+            </Tabs.Content>
+          </div>
+        </Tabs.Root>
       </div>
     </div>
   );
@@ -507,7 +510,7 @@ function EditLoginScreen({
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="mx-auto flex min-h-screen max-w-xl items-center px-4 py-10 sm:px-6">
-        <section className="w-full rounded-[28px] border bg-[var(--panel-strong)] p-6 shadow-sm" style={{ borderColor: 'var(--panel-border)' }}>
+        <section className="w-full rounded-[28px] border bg-[var(--panel-strong)] p-6 shadow-sm panel-border">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-alpha)] text-[var(--accent)]">
               <Lock className="h-5 w-5" />
@@ -523,7 +526,7 @@ function EditLoginScreen({
           <div className="mt-6 space-y-3">
             <label className="block">
               <span className="mb-2 block text-sm text-[var(--text-primary)]">管理口令</span>
-              <input
+              <AppInput
                 type="password"
                 value={loginToken}
                 onChange={(event) => onLoginTokenChange(event.target.value)}
@@ -533,9 +536,8 @@ function EditLoginScreen({
                     void onLogin();
                   }
                 }}
-                className="w-full rounded-[18px] border bg-[var(--background)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition-colors"
-                style={{ borderColor: 'var(--panel-border)' }}
                 placeholder="输入 COMPASS_ADMIN_TOKEN"
+                size="lg"
               />
             </label>
 
@@ -544,24 +546,15 @@ function EditLoginScreen({
             )}
 
             <div className="flex items-center gap-3">
-              <button
-                type="button"
+              <Button
+                state={isSubmittingLogin ? 'loading' : 'idle'}
+                loadingText="登录中"
+                leftIcon={<Lock className="h-4 w-4" />}
                 onClick={() => void onLogin()}
                 disabled={isSubmittingLogin}
-                className="flex items-center gap-2 rounded-[18px] bg-[var(--accent)] px-4 py-3 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isSubmittingLogin ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    登录中
-                  </>
-                ) : (
-                  <>
-                    <Lock className="h-4 w-4" />
-                    登录并开始编辑
-                  </>
-                )}
-              </button>
+                登录
+              </Button>
               <Link
                 href="/"
                 className="rounded-[18px] px-4 py-3 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
@@ -609,17 +602,23 @@ function YamlEditorSection({
             )}
           </div>
         </div>
-        <div className="edit-panel-body flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-          <textarea
-            value={yamlInput}
-            onChange={(event) => onChange(event.target.value)}
-            className={`min-h-0 flex-1 overflow-y-auto rounded-[20px] border bg-[var(--background)] p-4 font-mono text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)] text-[var(--foreground)] outline-none transition-colors [scrollbar-gutter:stable] ${
-              yamlError ? 'border-red-500/50' : ''
-            }`}
-            style={{ borderColor: yamlError ? undefined : 'var(--panel-border)' }}
-            placeholder="在此编辑 YAML 配置..."
-            spellCheck={false}
-          />
+        <div className="edit-panel-body flex min-h-0 flex-1 flex-col gap-2">
+          <div className="min-h-0 flex-1 overflow-hidden rounded-[20px] border panel-border bg-[var(--background)]">
+            <textarea
+              value={yamlInput}
+              onChange={(event) => onChange(event.target.value)}
+              placeholder="在此编辑 YAML 配置..."
+              spellCheck={false}
+              className={classNames(
+                'yaml-editor-scrollbar h-full w-full overflow-y-auto p-4 font-mono resize-none',
+                'text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)]',
+                '[scrollbar-gutter:stable] bg-transparent',
+                'text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)]',
+                'focus:ring-2 focus:ring-[var(--accent-border)]',
+                yamlError && 'ring-2 ring-red-500/50',
+              )}
+            />
+          </div>
           {yamlError && (
             <p className="mt-2 flex items-start gap-2 text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)] text-red-400">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -637,7 +636,7 @@ function YamlEditorSection({
 
 function SectionLoading() {
   return (
-    <div className="rounded-[24px] border bg-[var(--panel-strong)] px-5 py-10 text-center text-sm text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
+    <div className="rounded-[24px] border bg-[var(--panel-strong)] px-5 py-10 text-center text-sm text-[var(--muted)] panel-border">
       正在加载编辑器...
     </div>
   );
@@ -655,7 +654,7 @@ function CenteredStateCard({
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="mx-auto flex min-h-screen max-w-xl items-center px-4 py-10 sm:px-6">
-        <section className="w-full rounded-[28px] border bg-[var(--panel-strong)] p-6 text-center shadow-sm" style={{ borderColor: 'var(--panel-border)' }}>
+        <section className="w-full rounded-[28px] border bg-[var(--panel-strong)] p-6 text-center shadow-sm panel-border">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-alpha)]">
             {icon}
           </div>

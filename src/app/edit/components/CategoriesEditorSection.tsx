@@ -28,6 +28,8 @@ import LazyIconPicker from './LazyIconPicker';
 import DeleteConfirmButton from './DeleteConfirmButton';
 import { validateCategoryName } from '../utils/validators';
 import SortableLinkItem from './SortableLinkItem';
+import Button from '../../components/Button';
+import { AppInput } from '../../components/AppInput';
 
 const restrictToVerticalAxis: Modifier = ({ transform }) => ({
   ...transform,
@@ -50,23 +52,21 @@ interface CategoriesEditorSectionProps {
   onDeleteLink: (catIdx: number, linkIdx: number) => void;
 }
 
-// 空状态组件
 function EmptyState({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="rounded-[20px] border border-dashed py-16 text-center" style={{ borderColor: 'var(--panel-border)' }}>
+    <div className="rounded-[20px] border border-dashed py-16 text-center panel-border">
       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-secondary)]">
         <Folder className="h-8 w-8 text-[var(--muted)] opacity-60" />
       </div>
       <p className="text-base font-medium text-[var(--foreground)]">还没有分类</p>
       <p className="mt-1 text-sm text-[var(--muted)]">点击按钮添加第一个分类</p>
-      <button
-        type="button"
+      <Button
         onClick={onAdd}
-        className="mt-4 inline-flex items-center gap-2 rounded-[16px] bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90"
+        leftIcon={<Plus className="h-4 w-4" />}
+        className="mt-4"
       >
-        <Plus className="h-4 w-4" />
         添加分类
-      </button>
+      </Button>
     </div>
   );
 }
@@ -103,25 +103,28 @@ function SortableCategoryTab({
   return (
     <div
       ref={setNodeRef}
-      className={`group relative flex items-center gap-2 rounded-[14px] border px-3 py-2.5 cursor-pointer transition-colors will-change-transform ${
+      className={`group relative flex items-center gap-2 rounded-[14px] border px-3 py-2.5 cursor-pointer transition-colors will-change-transform panel-border ${
         isSelected
-          ? 'bg-[var(--accent-alpha)] border-[var(--accent)]'
+          ? 'bg-[var(--accent-alpha)] accent-border'
           : 'bg-[var(--background)] border-transparent hover:bg-[var(--bg-secondary)]'
       } ${isDragging ? 'shadow-lg' : ''}`}
-      style={{ borderColor: isSelected ? 'var(--accent-border)' : 'transparent', ...dndStyle }}
+      style={dndStyle}
       onClick={onClick}
     >
       {/* 拖拽手柄 */}
-      <button
-        type="button"
+      <Button
+        shape="icon"
+        leftIcon={<GripVertical />}
+        size="sm"
+        variant="ghost"
+        aria-label="拖拽排序"
+        title="拖拽排序"
         {...attributes}
         {...listeners}
         ref={setActivatorNodeRef}
-        className="flex h-8 w-6 cursor-grab touch-none select-none items-center justify-center text-[var(--muted)] transition-colors hover:text-[var(--foreground)] active:cursor-grabbing"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <GripVertical className="h-3.5 w-3.5" />
-      </button>
+        className="cursor-grab touch-none select-none active:cursor-grabbing [&_svg]:h-4 [&_svg]:w-4 [&_svg]:text-[var(--muted)]"
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      />
 
       {/* 颜色条 */}
       <div
@@ -213,55 +216,64 @@ function CategoryEditor({
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pr-1 [scrollbar-gutter:stable]">
       {/* 移动端返回按钮 */}
       {isMobile && onBack && (
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
+          leftIcon={<ChevronLeft className="h-3.5 w-3.5" />}
           onClick={onBack}
-          className="mb-2 flex items-center gap-1 text-xs text-[var(--muted)] transition-colors hover:text-[var(--foreground)]"
+          className="mb-2 !h-7 !px-2 text-xs"
         >
-          <ChevronLeft className="h-3.5 w-3.5" />
           返回分类列表
-        </button>
+        </Button>
       )}
 
       {/* 分类基本信息 */}
-      <div className="rounded-[18px] border bg-[var(--background)] p-3 sm:shrink-0 sm:p-4" style={{ borderColor: 'var(--panel-border)' }}>
+      <div className="rounded-[18px] border bg-[var(--background)] p-3 sm:shrink-0 sm:p-4 panel-border">
         {/* PC端：水平布局 */}
         {!isMobile && (
-          <div className="flex items-center gap-3">
+          <div className="flex items-end gap-3">
             {/* 图标选择 */}
-            <button
-              type="button"
-              onClick={() => setShowIconPicker(true)}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border bg-[var(--panel-strong)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
-              style={{ borderColor: 'var(--panel-border)' }}
-            >
-              <DynamicIcon name={category.icon} size={24} />
-            </button>
+            <div className="shrink-0">
+              <label className="mb-2 block text-xs font-medium text-[var(--muted)]">
+                Logo
+              </label>
+              <Button
+                shape="icon"
+                leftIcon={<DynamicIcon name={category.icon} size={20} />}
+                size="lg"
+                variant="secondary"
+                aria-label="更换图标"
+                title="更换图标"
+                onClick={() => setShowIconPicker(true)}
+                className="!h-[42px] !w-[42px] !rounded-[14px] !bg-[var(--panel-strong)] [&_svg]:text-[var(--foreground)]"
+              />
+            </div>
 
             {/* 名称输入 */}
             <div className="flex-1 min-w-0">
-              <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
+              <label className="mb-2 block text-xs font-medium text-[var(--muted)]">
                 分类名称
               </label>
-              <input
+              <AppInput
                 type="text"
                 value={category.name}
                 onChange={(e) => onUpdate('name', e.target.value)}
-                className={`w-full rounded-[14px] border bg-[var(--panel-strong)] px-4 py-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors ${
-                  nameError ? 'border-red-500/50' : ''
-                }`}
-                style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
+                error={!!nameError}
                 placeholder="分类名称"
+                inputClassName="font-medium bg-[var(--panel-strong)]"
+                size="sm"
               />
               {nameError && <p className="mt-1 text-xs text-red-400">{nameError}</p>}
             </div>
 
             {/* 颜色选择器 */}
             <div className="shrink-0">
-              <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
+              <label className="mb-2 block text-xs font-medium text-[var(--muted)]">
                 颜色
               </label>
-              <ColorPicker value={category.color} onChange={(color) => onUpdate('color', color)} />
+              <div className="flex h-[42px] items-center">
+                <ColorPicker value={category.color} onChange={(color) => onUpdate('color', color)} />
+              </div>
             </div>
           </div>
         )}
@@ -269,36 +281,42 @@ function CategoryEditor({
         {/* 移动端：垂直布局 */}
         {isMobile && (
           <div className="flex flex-col gap-2.5">
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => setShowIconPicker(true)}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] border bg-[var(--panel-strong)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
-                style={{ borderColor: 'var(--panel-border)' }}
-              >
-                <DynamicIcon name={category.icon} size={20} />
-              </button>
+            <div className="flex items-end gap-2.5">
+              <div className="shrink-0">
+                <label className="mb-1.5 block text-[11px] font-medium text-[var(--muted)]">
+                  Logo
+                </label>
+                <Button
+                  shape="icon"
+                  leftIcon={<DynamicIcon name={category.icon} size={18} />}
+                  size="md"
+                  variant="secondary"
+                  aria-label="更换图标"
+                  title="更换图标"
+                  onClick={() => setShowIconPicker(true)}
+                  className="!h-[38px] !w-[38px] !rounded-[12px] !bg-[var(--panel-strong)] [&_svg]:text-[var(--foreground)]"
+                />
+              </div>
 
               <div className="flex-1 min-w-0">
-                <label className="mb-1 block text-[11px] font-medium text-[var(--muted)]">
+                <label className="mb-1.5 block text-[11px] font-medium text-[var(--muted)]">
                   分类名称
                 </label>
-                <input
+                <AppInput
                   type="text"
                   value={category.name}
                   onChange={(e) => onUpdate('name', e.target.value)}
-                  className={`w-full rounded-[12px] border bg-[var(--panel-strong)] px-3 py-2 text-sm font-medium text-[var(--foreground)] outline-none transition-colors ${
-                    nameError ? 'border-red-500/50' : ''
-                  }`}
-                  style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
+                  error={!!nameError}
                   placeholder="分类名称"
+                  inputClassName="font-medium bg-[var(--panel-strong)]"
+                  size="sm"
                 />
                 {nameError && <p className="mt-1 text-xs text-red-400">{nameError}</p>}
               </div>
             </div>
 
             <div>
-              <label className="mb-1 block text-[11px] font-medium text-[var(--muted)]">
+              <label className="mb-1.5 block text-[11px] font-medium text-[var(--muted)]">
                 颜色
               </label>
               <div className="flex gap-2 overflow-x-auto py-2 [scrollbar-gutter:stable]">
@@ -315,29 +333,26 @@ function CategoryEditor({
           <h3 className="text-sm font-medium text-[var(--foreground)]">
             链接列表 <span className="text-[var(--muted)]">({category.links.length})</span>
           </h3>
-          <button
-            type="button"
+          <Button
+            size="sm"
+            leftIcon={<Plus className="h-3.5 w-3.5" />}
             onClick={onAddLink}
-            className="flex items-center gap-1 rounded-[12px] bg-[var(--accent)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90"
           >
-            <Plus className="h-3.5 w-3.5" />
             添加链接
-          </button>
+          </Button>
         </div>
 
         {category.links.length === 0 ? (
-          <div
-            className="rounded-[14px] border border-dashed py-8 text-center"
-            style={{ borderColor: 'var(--panel-border)' }}
-          >
+          <div className="rounded-[14px] border border-dashed py-8 text-center panel-border">
             <p className="text-sm text-[var(--muted)]">还没有链接</p>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={onAddLink}
-              className="mt-2 text-xs text-[var(--accent)] hover:underline"
+              className="mt-2 text-xs !text-[var(--accent)] hover:underline"
             >
               添加第一个链接
-            </button>
+            </Button>
           </div>
         ) : (
           <DndContext
@@ -480,14 +495,13 @@ export default function CategoriesEditorSection({
             <FolderOpen className="h-4 w-4 text-[var(--accent)]" />
             分类和链接
           </h2>
-          <button
-            type="button"
+          <Button
+            size="sm"
+            leftIcon={<Plus className="h-3.5 w-3.5" />}
             onClick={onAddCategory}
-            className="flex items-center gap-1.5 rounded-[16px] bg-[var(--accent)] px-3 py-2 text-xs font-medium text-white transition-colors hover:opacity-90"
           >
-            <Plus className="h-3.5 w-3.5" />
             添加分类
-          </button>
+          </Button>
         </div>
         <div className="edit-panel-body">
           <EmptyState onAdd={onAddCategory} />
@@ -505,21 +519,20 @@ export default function CategoriesEditorSection({
           <FolderOpen className="h-4 w-4 text-[var(--accent)]" />
           分类和链接
         </h2>
-        <button
-          type="button"
+        <Button
+          size="sm"
+          leftIcon={<Plus className="h-3.5 w-3.5" />}
           onClick={onAddCategory}
-          className="flex items-center gap-1 rounded-[14px] bg-[var(--accent)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90 sm:gap-1.5 sm:rounded-[16px] sm:px-3 sm:py-2"
         >
-          <Plus className="h-3.5 w-3.5" />
           <span className="hidden xsm:inline">添加分类</span>
           <span className="xsm:hidden">添加</span>
-        </button>
+        </Button>
       </div>
 
       {/* PC端布局：左右分栏 */}
       <div className="hidden lg:flex min-h-0 flex-1">
         {/* 左侧分类列表 */}
-        <div className="shrink-0 border-r w-64 xl:w-72" style={{ borderColor: 'var(--panel-border)' }}>
+        <div className="shrink-0 border-r w-64 xl:w-72 panel-border">
           <div className="h-full p-3 overflow-hidden">
             <DndContext
               sensors={categorySensors}

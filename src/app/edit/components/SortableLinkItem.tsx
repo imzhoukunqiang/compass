@@ -4,11 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, ChevronDown } from "lucide-react";
+import Button from "../../components/Button";
 import type { Link as LinkType } from "../../types";
 import LazyIconPicker from "./LazyIconPicker";
 import DynamicIcon from "../../components/DynamicIcon";
 import DeleteConfirmButton from "./DeleteConfirmButton";
 import { validateLinkName, validateLinkUrl } from "../utils/validators";
+import { AppInput } from "../../components/AppInput";
 
 interface SortableLinkItemProps {
   link: LinkType;
@@ -70,47 +72,48 @@ export default function SortableLinkItem({
           setNodeRef(node);
           itemRef.current = node;
         }}
-        className={`rounded-[14px] border bg-[var(--background)] px-3 py-2 transition-colors ${
+        className={`rounded-[14px] border bg-[var(--background)] px-3 py-2 transition-colors panel-border ${
           isDragging ? "shadow-lg ring-2 ring-[var(--accent)]" : ""
         }`}
-        style={{ borderColor: "var(--panel-border)", ...dndStyle }}
+        style={dndStyle}
       >
         <div className="flex items-center gap-2">
           {/* 拖拽手柄 */}
-          <button
-            type="button"
+          <Button
+            shape="icon"
+            leftIcon={<GripVertical />}
+            size="sm"
+            variant="ghost"
+            aria-label="拖拽排序"
+            title="拖拽排序"
             {...attributes}
             {...listeners}
             ref={setActivatorNodeRef}
-            className="flex h-9 w-7 cursor-grab touch-none select-none items-center justify-center text-[var(--muted)] transition-colors hover:text-[var(--foreground)] active:cursor-grabbing"
-            onClick={(e) => e.preventDefault()}
-          >
-            <GripVertical className="h-3.5 w-3.5" />
-          </button>
+            className="cursor-grab touch-none select-none active:cursor-grabbing [&_svg]:h-4 [&_svg]:w-4 [&_svg]:text-[var(--muted)]"
+            onClick={(e: React.MouseEvent) => e.preventDefault()}
+          />
 
           {/* 图标选择 */}
-          <button
-            type="button"
+          <Button
+            shape="icon"
+            leftIcon={<DynamicIcon name={link.icon} size={16} />}
+            size="sm"
+            variant="secondary"
+            title="更换图标"
+            aria-label="更换图标"
+            className="!bg-[var(--background)] [&_svg]:text-[var(--foreground)]"
             onClick={() => setShowIconPicker(true)}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border bg-[var(--panel-strong)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
-            style={{ borderColor: "var(--panel-border)" }}
-          >
-            <DynamicIcon name={link.icon} size={16} />
-          </button>
+          />
 
           {/* 名称输入 */}
           <div className="min-w-0 flex-1">
-            <input
+            <AppInput
               type="text"
               value={link.name}
               onChange={(e) => onUpdate("name", e.target.value)}
-              className={`w-full rounded-[10px] border bg-[var(--panel-strong)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none transition-colors ${
-                nameError ? "border-red-500/50" : ""
-              }`}
-              style={{
-                borderColor: nameError ? undefined : "var(--panel-border)",
-              }}
+              error={!!nameError}
               placeholder="链接名称"
+              size="sm"
             />
             {nameError && (
               <p className="mt-0.5 text-[10px] text-red-400">{nameError}</p>
@@ -119,17 +122,13 @@ export default function SortableLinkItem({
 
           {/* URL 输入 - PC端 */}
           <div className="min-w-0 flex-1 hidden sm:block">
-            <input
+            <AppInput
               type="text"
               value={link.url}
               onChange={(e) => onUpdate("url", e.target.value)}
-              className={`w-full rounded-[10px] border bg-[var(--panel-strong)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none transition-colors ${
-                urlError ? "border-red-500/50" : ""
-              }`}
-              style={{
-                borderColor: urlError ? undefined : "var(--panel-border)",
-              }}
+              error={!!urlError}
               placeholder="https://..."
+              size="sm"
             />
             {urlError && (
               <p className="mt-0.5 text-[10px] text-red-400">{urlError}</p>
@@ -150,17 +149,13 @@ export default function SortableLinkItem({
         <div className={`${showAdvanced ? 'mt-2 space-y-1.5 pl-6' : 'hidden'} sm:mt-2 sm:block sm:space-y-1.5 sm:pl-6`}>
           {/* 移动端 URL 输入 */}
           <div className="sm:hidden">
-            <input
+            <AppInput
               type="text"
               value={link.url}
               onChange={(e) => onUpdate("url", e.target.value)}
-              className={`w-full rounded-[10px] border bg-[var(--panel-strong)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none transition-colors ${
-                urlError ? "border-red-500/50" : ""
-              }`}
-              style={{
-                borderColor: urlError ? undefined : "var(--panel-border)",
-              }}
+              error={!!urlError}
               placeholder="https://..."
+              size="sm"
             />
             {urlError && (
               <p className="mt-0.5 text-[10px] text-red-400">{urlError}</p>
@@ -168,27 +163,27 @@ export default function SortableLinkItem({
           </div>
 
           {/* 描述输入 */}
-          <input
+          <AppInput
             type="text"
             value={link.description}
             onChange={(e) => onUpdate("description", e.target.value)}
-            className="w-full rounded-[10px] border bg-[var(--panel-strong)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)]"
-            style={{ borderColor: "var(--panel-border)" }}
             placeholder="描述（可选）"
+            size="sm"
           />
         </div>
 
         {/* 移动端展开/收起按钮 */}
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className={`mt-2 flex w-full items-center justify-center gap-1 rounded-[10px] py-1.5 text-xs transition-colors sm:hidden ${
-            showAdvanced ? 'bg-[var(--accent-alpha)] text-[var(--accent)]' : 'text-[var(--muted)]'
+          rightIcon={<ChevronDown className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />}
+          className={`mt-2 w-full sm:hidden ${
+            showAdvanced ? '!bg-[var(--accent-alpha)] !text-[var(--accent)]' : '!text-[var(--muted)]'
           }`}
         >
-          <span>{showAdvanced ? '收起' : '展开'}</span>
-          <ChevronDown className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
-        </button>
+          {showAdvanced ? '收起' : '展开'}
+        </Button>
       </div>
 
       {showIconPicker && (
