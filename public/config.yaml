@@ -34,16 +34,21 @@ categories:
         url: http://192.168.6.5:4567/
         icon: BookImage
         description: Suwayomi漫画
-      - id: link-1775485254999-r30afxsl7
-        name: Portainer
-        url: https://192.168.6.5:9443/
-        icon: docker
-        description: Docker管理
+      - id: link-1776520839724-jrr7onojm
+        name: Uptime Kuma
+        url: http://192.168.6.5:3001/
+        icon: uptimekuma
+        description: 网络监控
       - id: link-1775485303694-7b1mpfwlm
         name: AdGuard Home
         url: http://192.168.6.5:3000/
         icon: adguard
         description: DNS后台
+      - id: link-1775485254999-r30afxsl7
+        name: Portainer
+        url: https://192.168.6.5:9443/
+        icon: docker
+        description: Docker管理
   - id: cloud
     name: Cloud
     icon: Cloud
