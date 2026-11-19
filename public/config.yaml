@@ -49,6 +49,11 @@ categories:
         url: https://192.168.6.5:9443/
         icon: docker
         description: Docker管理
+      - id: link-1795073791941-4jun4k263
+        name: ETF-系数
+        url: http://192.168.6.5:8111/
+        icon: Link
+        description: ETF-系数
   - id: cloud
     name: Cloud
     icon: Cloud
